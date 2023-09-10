@@ -102,6 +102,7 @@ public class Lexer {
             return null;
         }
         Token token = new Token(sql.substring(inputCursor.getPointer(), cursor.getPointer()), TokenType.NUMERIC, new Location(inputCursor.getLocation()));
+        //TODO: check if its taking effect
         inputCursor = cursor;
         return token;
     }
