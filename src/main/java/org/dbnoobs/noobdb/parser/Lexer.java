@@ -1,9 +1,6 @@
 package org.dbnoobs.noobdb.parser;
 
-import org.dbnoobs.noobdb.tokens.Cursor;
-import org.dbnoobs.noobdb.tokens.Location;
-import org.dbnoobs.noobdb.tokens.Token;
-import org.dbnoobs.noobdb.tokens.TokenType;
+import org.dbnoobs.noobdb.tokens.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -39,7 +36,36 @@ public class Lexer {
         return null;
     }
 
-    private Token lexSymbol(String input, Cursor cursor){
+    public Token lexSymbol(String input, Cursor inputCursor){
+        if(input == null || input.isEmpty() || inputCursor.getPointer() >= input.length()){
+            return null;
+        }
+        Cursor cursor = new Cursor(inputCursor);
+
+        // white space syntax
+        char c = input.charAt(cursor.getPointer());
+        if(c == '\n'){
+            inputCursor.incrementLine();
+            return null;
+        }else if(c == '\t' || c == ' '){
+            inputCursor.increment();
+            return null;
+        }
+
+        boolean matchFound = false;
+        for(char symbol: Symbols.SYMBOLS){
+            if(symbol == c){
+                cursor.increment();
+                matchFound = true;
+                break;
+            }
+        }
+
+        if(matchFound){
+            Token token = new Token(input.substring(inputCursor.getPointer(), inputCursor.getPointer()+1), TokenType.SYMBOL, new Location(inputCursor.getLocation()));
+            inputCursor.copy(cursor);
+            return token;
+        }
         return null;
     }
 
@@ -65,7 +91,7 @@ public class Lexer {
                     cursor.increment();
                 }else{
                     Token token = new Token(value.toString(), TokenType.STRING, new Location(inputCursor.getLocation()));
-                    inputCursor.modify(cursor);
+                    inputCursor.copy(cursor);
                     return token;
                 }
             }
@@ -133,7 +159,7 @@ public class Lexer {
         }
 
         Token token = new Token(sql.substring(inputCursor.getPointer(), cursor.getPointer()), TokenType.NUMERIC, new Location(inputCursor.getLocation()));
-        inputCursor.modify(cursor);
+        inputCursor.copy(cursor);
         return token;
     }
 

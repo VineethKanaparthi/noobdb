@@ -41,4 +41,17 @@ class LexerTest {
     @Test
     void lexNumeric() {
     }
+
+    @Test
+    void lexSymbol(){
+        Token actualLeftParan = lexer.lexSymbol(" (", new Cursor(1, new Location(1, 1)));
+        Assertions.assertEquals("(", actualLeftParan.getValue());
+        Assertions.assertEquals(TokenType.SYMBOL, actualLeftParan.getTokenType());
+        Assertions.assertEquals(new Location(1, 1), actualLeftParan.getLocation());
+
+        Token actualRightParan = lexer.lexSymbol(" )) ", new Cursor(1, new Location(1, 1)));
+        Assertions.assertEquals(")", actualRightParan.getValue());
+        Assertions.assertEquals(TokenType.SYMBOL, actualRightParan.getTokenType());
+        Assertions.assertEquals(new Location(1, 1), actualRightParan.getLocation());
+    }
 }

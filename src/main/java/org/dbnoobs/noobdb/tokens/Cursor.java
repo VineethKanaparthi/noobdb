@@ -46,7 +46,7 @@ public class Cursor {
         this.getLocation().incrementCol(i);
     }
 
-    public void modify(Cursor cursor){
+    public void copy(Cursor cursor){
         this.pointer = cursor.getPointer();
         this.location = cursor.getLocation();
     }
