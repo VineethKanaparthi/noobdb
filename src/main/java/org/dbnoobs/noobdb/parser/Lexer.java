@@ -180,8 +180,44 @@ public class Lexer {
         return token;
     }
 
-    private Token lexIdentifier(String input, Cursor cursor){
-        return null;
+    /**
+     * identifiers can be eitther double quoted string or a group of characters starting with an alphabetical char
+     * @param input
+     * @param inputCursor
+     * @return
+     */
+    public Token lexIdentifier(String input, Cursor inputCursor){
+        if(input == null || inputCursor.getPointer() >= input.length()){
+            return null;
+        }
+
+        Token token = lexCharacterDelimited(input, inputCursor, '\"');
+        if(token == null){
+            Cursor cursor = new Cursor(inputCursor);
+            char c = input.charAt(cursor.getPointer());
+            boolean isAlphabetical = (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z');
+            if(!isAlphabetical){
+                return null;
+            }
+            cursor.increment();
+            StringBuilder value = new StringBuilder();
+            value.append(c);
+            while(cursor.getPointer() < input.length()){
+                c = input.charAt(cursor.getPointer());
+                isAlphabetical = (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z');
+                boolean isNumeric = (c >= '0' && c<='9');
+                if(isNumeric || isAlphabetical || c == '$' || c == '_'){
+                    value.append(c);
+                    cursor.increment();
+                    continue;
+                }
+                break;
+            }
+            token = new Token(value.toString(), TokenType.IDENTIFIER, new Location(inputCursor.getLocation()));
+            inputCursor.copy(cursor);
+        }
+        token.setTokenType(TokenType.IDENTIFIER);
+        return token;
     }
 
 }

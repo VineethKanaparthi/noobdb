@@ -7,6 +7,7 @@ import org.dbnoobs.noobdb.tokens.TokenType;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+// TODO: Add more tests
 class LexerTest {
     private final Lexer lexer = new Lexer();
 
@@ -82,5 +83,26 @@ class LexerTest {
         Assertions.assertEquals(5, cursor.getPointer());
         Assertions.assertEquals(1, cursor.getLocation().getLine());
         Assertions.assertEquals(5, cursor.getLocation().getCol());
+    }
+
+    @Test
+    void lexIdentifier(){
+        Cursor cursor = new Cursor(1, new Location(1, 1));
+        Token intToken = lexer.lexIdentifier(" \"identifier1\"", cursor);
+        Assertions.assertEquals("identifier1", intToken.getValue());
+        Assertions.assertEquals(new Location(1, 1), intToken.getLocation());
+        Assertions.assertEquals(TokenType.IDENTIFIER, intToken.getTokenType());
+        Assertions.assertEquals(13, cursor.getPointer());
+        Assertions.assertEquals(1, cursor.getLocation().getLine());
+        Assertions.assertEquals(13, cursor.getLocation().getCol());
+
+        cursor = new Cursor(1, new Location(1, 1));
+        Token intoToken = lexer.lexIdentifier(" identifier1", cursor);
+        Assertions.assertEquals("identifier1", intoToken.getValue());
+        Assertions.assertEquals(new Location(1, 1), intoToken.getLocation());
+        Assertions.assertEquals(TokenType.IDENTIFIER, intoToken.getTokenType());
+        Assertions.assertEquals(12, cursor.getPointer());
+        Assertions.assertEquals(1, cursor.getLocation().getLine());
+        Assertions.assertEquals(12, cursor.getLocation().getCol());
     }
 }
