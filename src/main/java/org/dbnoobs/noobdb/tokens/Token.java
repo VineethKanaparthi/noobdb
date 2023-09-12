@@ -50,5 +50,14 @@ public class Token {
     public int hashCode() {
         return Objects.hash(value, tokenType, location);
     }
+
+    @Override
+    public String toString() {
+        return "Token{" +
+                "value='" + value + '\'' +
+                ", tokenType=" + tokenType +
+                ", location=" + location +
+                '}';
+    }
 }
 

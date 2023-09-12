@@ -63,23 +63,23 @@ public class Lexer {
         char c = input.charAt(cursor.getPointer());
         if(c == '\n'){
             inputCursor.incrementLine();
-            return null;
+            return new Token("\n", TokenType.WHITESPACE, new Location());
         }else if(c == '\t' || c == ' '){
             inputCursor.increment();
-            return null;
+            return new Token("\n", TokenType.WHITESPACE, new Location());
         }
 
-        boolean matchFound = false;
-        for(char symbol: Symbols.SYMBOLS){
-            if(symbol == c){
-                cursor.increment();
-                matchFound = true;
-                break;
+        String match = null;
+        for(String symbol : Symbols.SYMBOLS){
+            int begin = cursor.getPointer();
+            int end = begin + symbol.length();
+            if(end <= input.length() && symbol.equalsIgnoreCase(input.substring(begin, end)) && (match == null || symbol.length() > match.length())){
+                match = symbol;
             }
         }
-
-        if(matchFound){
-            Token token = new Token(input.substring(inputCursor.getPointer(), inputCursor.getPointer()+1), TokenType.SYMBOL, new Location(inputCursor.getLocation()));
+        if(match != null){
+            Token token = new Token(match, TokenType.SYMBOL, new Location(cursor.getLocation()));
+            cursor.increment(match.length());
             inputCursor.copy(cursor);
             return token;
         }
@@ -103,11 +103,12 @@ public class Lexer {
         StringBuilder value = new StringBuilder();
         while(cursor.getPointer() < n){
             if(input.charAt(cursor.getPointer()) == delimiter){
-                if(cursor.getPointer() + 1 < n && input.charAt(cursor.getPointer()) == delimiter){
+                if(cursor.getPointer() + 1 < n && input.charAt(cursor.getPointer()+1) == delimiter){
                     value.append(delimiter);
                     cursor.increment();
                 }else{
                     Token token = new Token(value.toString(), TokenType.STRING, new Location(inputCursor.getLocation()));
+                    cursor.increment();
                     inputCursor.copy(cursor);
                     return token;
                 }

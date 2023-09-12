@@ -13,6 +13,13 @@ class LexerTest {
 
     @Test
     void lex() {
+        System.out.println(lexer.lex("select a"));
+        System.out.println(lexer.lex("select 1"));
+        System.out.println(lexer.lex("select true"));
+        System.out.println(lexer.lex("select 'foo' || 'bar';"));
+        System.out.println(lexer.lex("CREATE TABLE u (id INT, name TEXT)"));
+        System.out.println(lexer.lex("insert into users Values (105, 233)"));
+        System.out.println(lexer.lex("SELECT id FROM users;"));
     }
 
     @Test
