@@ -4,6 +4,11 @@ public class Cursor {
     private int pointer;
     private Location location;
 
+    public Cursor(){
+        this.pointer = 0;
+        this.location = new Location();
+    }
+
     public Cursor(int pointer, Location location) {
         this.pointer = pointer;
         this.location = location;
@@ -30,8 +35,20 @@ public class Cursor {
         this.location = location;
     }
 
-    public void increment(){
+    public void incrementLine(){
         this.pointer++;
+        this.getLocation().incrementLine();
+    }
+
+    public void increment(Integer ...incrementValue){
+        int i = incrementValue.length>0?incrementValue[0]:1;
+        this.pointer+=i;
+        this.getLocation().incrementCol(i);
+    }
+
+    public void modify(Cursor cursor){
+        this.pointer = cursor.getPointer();
+        this.location = cursor.getLocation();
     }
 
 }

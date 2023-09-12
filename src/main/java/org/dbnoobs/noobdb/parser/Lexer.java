@@ -12,15 +12,17 @@ import java.util.List;
 public class Lexer {
     public List<Token> lex(String sql){
         List<Token> tokens = new ArrayList<>();
-        Cursor cursor = new Cursor(0, new Location(0, 0));
-        int i = 0, n = sql.length();
+        Cursor cursor = new Cursor();
+        int n = sql.length();
+        List<LexerFunction> lexers = Arrays.asList(this::lexKeyword, this::lexSymbol, this::lexString, this::lexNumeric, this::lexIdentifier);
         while(cursor.getPointer() < n){
-            List<LexerFunction> lexers = Arrays.asList(this::lexKeyword, this::lexSymbol, this::lexString, this::lexNumeric, this::lexIdentifier);
             boolean tokenFound = false;
             for(LexerFunction lexer : lexers){
                 Token token = lexer.apply(sql, cursor);
                 if(token != null){
-                    tokens.add(token);
+                    if(!TokenType.WHITESPACE.equals(token.getTokenType())){
+                        tokens.add(token);
+                    }
                     tokenFound = true;
                     break;
                 }
@@ -41,11 +43,39 @@ public class Lexer {
         return null;
     }
 
-    private Token lexString(String input, Cursor cursor){
+    public Token lexString(String input, Cursor cursor){
+        return lexCharacterDelimited(input, cursor, '\'');
+    }
+
+    public Token lexCharacterDelimited(String input, Cursor inputCursor, char delimiter){
+        if(input == null || input.isEmpty()){
+            return null;
+        }
+        int n = input.length();
+        Cursor cursor = new Cursor(inputCursor);
+        if(cursor.getPointer() > n || input.charAt(cursor.getPointer()) != delimiter){
+            return null;
+        }
+        cursor.increment();
+        StringBuilder value = new StringBuilder();
+        while(cursor.getPointer() < n){
+            if(input.charAt(cursor.getPointer()) == delimiter){
+                if(cursor.getPointer() + 1 < n && input.charAt(cursor.getPointer()) == delimiter){
+                    value.append(delimiter);
+                    cursor.increment();
+                }else{
+                    Token token = new Token(value.toString(), TokenType.STRING, new Location(inputCursor.getLocation()));
+                    inputCursor.modify(cursor);
+                    return token;
+                }
+            }
+            value.append(input.charAt(cursor.getPointer()));
+            cursor.increment();
+        }
         return null;
     }
 
-    private Token lexNumeric(String sql, Cursor inputCursor){
+    public Token lexNumeric(String sql, Cursor inputCursor){
         if(sql == null || sql.isEmpty()){
             return null;
         }
@@ -101,9 +131,9 @@ public class Lexer {
         if(!atLeastOneDigitExists){
             return null;
         }
+
         Token token = new Token(sql.substring(inputCursor.getPointer(), cursor.getPointer()), TokenType.NUMERIC, new Location(inputCursor.getLocation()));
-        //TODO: check if its taking effect
-        inputCursor = cursor;
+        inputCursor.modify(cursor);
         return token;
     }
 

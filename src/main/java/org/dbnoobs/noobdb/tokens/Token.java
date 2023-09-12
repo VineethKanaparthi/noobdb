@@ -43,12 +43,12 @@ public class Token {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Token token = (Token) o;
-        return Objects.equals(value, token.value) && tokenType == token.tokenType;
+        return Objects.equals(value, token.value) && tokenType == token.tokenType && Objects.equals(location, token.location);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(value, tokenType);
+        return Objects.hash(value, tokenType, location);
     }
 }
 

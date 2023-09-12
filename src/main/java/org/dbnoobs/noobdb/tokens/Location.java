@@ -1,8 +1,15 @@
 package org.dbnoobs.noobdb.tokens;
 
+import java.util.Objects;
+
 public class Location {
     private int line;
     private int col;
+
+    public Location(){
+        this.line = 1;
+        this.col = 0;
+    }
 
     public Location(int line, int col) {
         this.line = line;
@@ -30,4 +37,26 @@ public class Location {
         this.col = col;
     }
 
+    public void incrementLine(){
+        this.line++;
+        this.col = 0;
+    }
+
+    public void incrementCol(Integer ...incrementValue){
+        int i = incrementValue.length>0?incrementValue[0]:1;
+        this.col+=i;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Location location = (Location) o;
+        return line == location.line && col == location.col;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(line, col);
+    }
 }
