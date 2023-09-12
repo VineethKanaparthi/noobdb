@@ -11,4 +11,7 @@ public class KeyWords {
     public static final String VALUES_KEYWORD = "values";
     public static final String INT_KEYWORD = "int";
     public static final String TEXT_KEYWORD = "text";
+
+    public static final String[] KEYWORDS = {SELECT_KEYWORD, FROM_KEYWORD, AS_KEYWORD, TABLE_KEYWORD, CREATE_KEYWORD,
+    INSERT_KEYWORD, INT_KEYWORD, INTO_KEYWORD, VALUES_KEYWORD, TEXT_KEYWORD};
 }

@@ -32,7 +32,24 @@ public class Lexer {
         return tokens;
     }
 
-    private Token lexKeyword(String input, Cursor cursor){
+    // TODO: Check why eaton phil used longest match instead of directly comparing strings
+    public Token lexKeyword(String input, Cursor cursor){
+        if(input == null || cursor.getPointer() >= input.length()){
+            return null;
+        }
+        String match = null;
+        for(String keyword : KeyWords.KEYWORDS){
+            int begin = cursor.getPointer();
+            int end = begin + keyword.length();
+            if(end <= input.length() && keyword.equalsIgnoreCase(input.substring(begin, end)) && (match == null || keyword.length() > match.length())){
+                match = keyword;
+            }
+        }
+        if(match != null){
+            Token token = new Token(match, TokenType.KEYWORD, new Location(cursor.getLocation()));
+            cursor.increment(match.length());
+            return token;
+        }
         return null;
     }
 
