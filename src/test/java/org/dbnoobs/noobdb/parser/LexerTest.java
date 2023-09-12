@@ -1,13 +1,13 @@
 package org.dbnoobs.noobdb.parser;
 
-import org.dbnoobs.noobdb.tokens.Cursor;
-import org.dbnoobs.noobdb.tokens.Location;
-import org.dbnoobs.noobdb.tokens.Token;
-import org.dbnoobs.noobdb.tokens.TokenType;
+import org.dbnoobs.noobdb.parser.tokens.Cursor;
+import org.dbnoobs.noobdb.parser.tokens.Location;
+import org.dbnoobs.noobdb.parser.tokens.Token;
+import org.dbnoobs.noobdb.parser.tokens.TokenType;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-// TODO: Add more tests
+// TODO: Add more comprehensive tests
 class LexerTest {
     private final Lexer lexer = new Lexer();
 

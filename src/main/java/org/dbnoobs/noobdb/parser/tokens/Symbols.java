@@ -1,4 +1,4 @@
-package org.dbnoobs.noobdb.tokens;
+package org.dbnoobs.noobdb.parser.tokens;
 
 public class Symbols {
     public static final String SEMICOLON_SYMBOL = ";";

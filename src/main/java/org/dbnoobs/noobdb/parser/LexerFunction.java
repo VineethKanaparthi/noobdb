@@ -1,7 +1,7 @@
 package org.dbnoobs.noobdb.parser;
 
-import org.dbnoobs.noobdb.tokens.Cursor;
-import org.dbnoobs.noobdb.tokens.Token;
+import org.dbnoobs.noobdb.parser.tokens.Cursor;
+import org.dbnoobs.noobdb.parser.tokens.Token;
 
 @FunctionalInterface
 public interface LexerFunction {

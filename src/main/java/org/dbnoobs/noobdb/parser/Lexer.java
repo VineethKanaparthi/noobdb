@@ -1,6 +1,6 @@
 package org.dbnoobs.noobdb.parser;
 
-import org.dbnoobs.noobdb.tokens.*;
+import org.dbnoobs.noobdb.parser.tokens.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;

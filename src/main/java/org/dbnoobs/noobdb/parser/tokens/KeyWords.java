@@ -1,4 +1,4 @@
-package org.dbnoobs.noobdb.tokens;
+package org.dbnoobs.noobdb.parser.tokens;
 
 public class KeyWords {
     public static final String SELECT_KEYWORD = "select";
