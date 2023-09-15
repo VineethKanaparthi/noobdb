@@ -30,8 +30,8 @@ class LexerTest {
         Assertions.assertEquals("This is a string with ''escaped'' apostrophes.", token.getValue());
         Assertions.assertEquals(TokenType.STRING, token.getTokenType());
         Assertions.assertEquals(new Location(), token.getLocation());
-        Assertions.assertEquals(new Location(1, 47), ic.getLocation());
-        Assertions.assertEquals(47, ic.getPointer());
+        Assertions.assertEquals(new Location(1, 48), ic.getLocation());
+        Assertions.assertEquals(48, ic.getPointer());
     }
 
     @Test
@@ -42,8 +42,8 @@ class LexerTest {
         Assertions.assertEquals("This is a string with \"\"escaped\"\" double quotes.", token.getValue());
         Assertions.assertEquals(TokenType.STRING, token.getTokenType());
         Assertions.assertEquals(new Location(1, 3), token.getLocation());
-        Assertions.assertEquals(new Location(1, 52), ic.getLocation());
-        Assertions.assertEquals(52, ic.getPointer());
+        Assertions.assertEquals(new Location(1, 53), ic.getLocation());
+        Assertions.assertEquals(53, ic.getPointer());
     }
 
     @Test
@@ -99,9 +99,9 @@ class LexerTest {
         Assertions.assertEquals("identifier1", intToken.getValue());
         Assertions.assertEquals(new Location(1, 1), intToken.getLocation());
         Assertions.assertEquals(TokenType.IDENTIFIER, intToken.getTokenType());
-        Assertions.assertEquals(13, cursor.getPointer());
+        Assertions.assertEquals(14, cursor.getPointer());
         Assertions.assertEquals(1, cursor.getLocation().getLine());
-        Assertions.assertEquals(13, cursor.getLocation().getCol());
+        Assertions.assertEquals(14, cursor.getLocation().getCol());
 
         cursor = new Cursor(1, new Location(1, 1));
         Token intoToken = lexer.lexIdentifier(" identifier1", cursor);

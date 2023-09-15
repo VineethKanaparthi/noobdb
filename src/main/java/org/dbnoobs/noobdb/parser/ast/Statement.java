@@ -1,5 +1,7 @@
 package org.dbnoobs.noobdb.parser.ast;
 
+import java.util.Objects;
+
 public class Statement {
     private SelectStatement selectStatement;
     private CreateTableStatement createTableStatement;
@@ -57,5 +59,18 @@ public class Statement {
                 ", insertStatement=" + insertStatement +
                 ", type=" + type +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Statement statement = (Statement) o;
+        return Objects.equals(selectStatement, statement.selectStatement) && Objects.equals(createTableStatement, statement.createTableStatement) && Objects.equals(insertStatement, statement.insertStatement) && type == statement.type;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(selectStatement, createTableStatement, insertStatement, type);
     }
 }

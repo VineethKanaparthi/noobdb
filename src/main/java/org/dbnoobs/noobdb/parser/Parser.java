@@ -13,6 +13,10 @@ public class Parser {
 
     public AST parse(String source){
         List<Token> tokens = new Lexer().lex(source);
+        Token semiColonToken = tokenFromSymbol(Symbols.SEMICOLON_SYMBOL);
+        if(tokens.size() > 0 && !tokens.get(tokens.size()-1).equals(semiColonToken)){
+            tokens.add(semiColonToken);
+        }
         AST ast = null;
         if(tokens != null && tokens.size() > 0){
             Cursor cursor = new Cursor();
@@ -97,7 +101,7 @@ public class Parser {
         cursor.increment();
         SelectStatement selectStatement = new SelectStatement();
         // expect atLeast one expression
-        List<Expression> expressions = new ArrayList<>();
+        List<SelectItem> selectItems = new ArrayList<>();
         while(true){
 
             if(cursor.getIndex() >= tokens.size()){
@@ -110,7 +114,7 @@ public class Parser {
                 break;
             }
 
-            if(expressions.size() > 0){
+            if(selectItems.size() > 0){
                 boolean isComma = expectToken(tokens, cursor, tokenFromSymbol(Symbols.COMMA_SYMBOL));
                 if(isComma){
                     cursor.increment();
@@ -120,15 +124,15 @@ public class Parser {
                 }
             }
 
-            Expression expression = parseExpression(tokens, cursor);
-            if(expression == null){
+            SelectItem selectItem = paresSelectItem(tokens, cursor);
+            if(selectItem == null){
                 throw new RuntimeException("Expected expression but not found");
             }else{
-                expressions.add(expression);
+                selectItems.add(selectItem);
             }
         }
 
-        selectStatement.setItems(expressions);
+        selectStatement.setItems(selectItems);
         // optionally expect from and table_name identifier
         if(expectToken(tokens, cursor, tokenFromKeyword(KeyWords.FROM_KEYWORD))){
             cursor.increment();
@@ -140,6 +144,37 @@ public class Parser {
         }
         inputCursor.setIndex(cursor.getIndex());
         return selectStatement;
+    }
+
+    private SelectItem paresSelectItem(List<Token> tokens, Cursor inputCursor) {
+        if(tokens == null || inputCursor == null || inputCursor.getIndex() >= tokens.size()){
+            return null;
+        }
+        Cursor cursor = new Cursor(inputCursor.getIndex());
+        if(expectToken(tokens, cursor, tokenFromSymbol(Symbols.ASTERISK_SYMBOL))){
+            SelectItem selectItem = new SelectItem();
+            selectItem.setAsterisk(true);
+            cursor.increment();
+            inputCursor.increment();
+            return selectItem;
+        }else{
+            Expression expression = parseExpression(tokens, cursor);
+            if(expression == null){
+                return null;
+            }
+            SelectItem selectItem = new SelectItem();
+            selectItem.setExpression(expression);
+            if(expectToken(tokens, cursor, tokenFromKeyword(KeyWords.AS_KEYWORD))){
+                cursor.increment();
+                Token as = parseToken(tokens, cursor, TokenType.IDENTIFIER);
+                if(as == null){
+                    throw new RuntimeException("Expected alias after as");
+                }
+                selectItem.setAs(as);
+            }
+            inputCursor.setIndex(cursor.getIndex());
+            return selectItem;
+        }
     }
 
     // does increment cursor
@@ -156,7 +191,6 @@ public class Parser {
                 return new Expression(token, ExpressionType.LITERAL);
             }
         }
-
         return null;
     }
 

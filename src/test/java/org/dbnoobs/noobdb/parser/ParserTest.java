@@ -1,13 +1,15 @@
 package org.dbnoobs.noobdb.parser;
 
+import org.dbnoobs.noobdb.parser.datagen.ASTGenerator;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 class ParserTest {
 
     @Test
     void parse() {
-//        System.out.println(new Parser().parse("select * from table"));
-//        System.out.println(new Parser().parse("select user from table1"));
-        System.out.println(new Parser().parse("select user from db_table;"));
+        Parser parser = new Parser();
+        Assertions.assertEquals(ASTGenerator.getSelectStarAST(), parser.parse("select *, exclusive"));
+        Assertions.assertEquals(ASTGenerator.getSimpleSelectItemsAST(), parser.parse("select id, name as fullname from users"));
     }
 }
