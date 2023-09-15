@@ -88,4 +88,41 @@ public class ASTGenerator {
         );
     }
 
+    public static AST getInsertStatement(){
+        return new AST(
+                List.of(
+                        new Statement(
+                                null,
+                                null,
+                                new InsertStatement(
+                                        new Token(
+                                                "users",
+                                                TokenType.IDENTIFIER,
+                                                new Location(1, 12)
+                                        ),
+                                        Arrays.asList(
+                                                new Expression(
+                                                        new Token(
+                                                                "105",
+                                                                TokenType.NUMERIC,
+                                                                new Location(1, 26)
+                                                        ),
+                                                        ExpressionType.LITERAL
+                                                ),
+                                                new Expression(
+                                                        new Token(
+                                                                "233",
+                                                                TokenType.NUMERIC,
+                                                                new Location(1, 31)
+                                                        ),
+                                                        ExpressionType.LITERAL
+                                                )
+                                        )
+                                ),
+                                ASTType.INSERT
+                        )
+                )
+        );
+    }
+
 }

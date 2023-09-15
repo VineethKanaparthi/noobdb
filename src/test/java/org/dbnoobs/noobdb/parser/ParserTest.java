@@ -16,6 +16,6 @@ class ParserTest {
     @Test
     void parseInsert() {
         Parser parser = new Parser();
-        System.out.println(parser.parse("INSERT INTO users VALUES (105, 233)"));
+        Assertions.assertEquals(ASTGenerator.getInsertStatement(), parser.parse("INSERT INTO users VALUES (105, 233)"));
    }
 }
