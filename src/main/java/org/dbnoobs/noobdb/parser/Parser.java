@@ -14,7 +14,7 @@ public class Parser {
     public AST parse(String source){
         List<Token> tokens = new Lexer().lex(source);
         Token semiColonToken = tokenFromSymbol(Symbols.SEMICOLON_SYMBOL);
-        if(tokens.size() > 0 && !tokens.get(tokens.size()-1).equals(semiColonToken)){
+        if(tokens!= null && tokens.size() > 0 && !tokens.get(tokens.size()-1).equals(semiColonToken)){
             tokens.add(semiColonToken);
         }
         AST ast = null;
@@ -48,7 +48,8 @@ public class Parser {
             return false;
         }
         Token actualToken = tokens.get(cursor.getIndex());
-        return (actualToken != null && expectedToken.getTokenType().equals(actualToken.getTokenType()) && expectedToken.getValue().equalsIgnoreCase(actualToken.getValue()));
+        return (actualToken != null && expectedToken.getTokenType().equals(actualToken.getTokenType())
+                && expectedToken.getValue().equalsIgnoreCase(actualToken.getValue()));
     }
 
     private Token tokenFromSymbol(String symbol) {
@@ -69,14 +70,14 @@ public class Parser {
             inputCursor.setIndex(cursor.getIndex());
             return statement;
         }
-//        InsertStatement insertStatement = parseInsertStatement(tokens, cursor);
-//        if(insertStatement != null){
-//            Statement statement = new Statement();
-//            statement.setInsertStatement(insertStatement);
-//            statement.setType(ASTType.INSERT);
-//            inputCursor.setIndex(cursor.getIndex());
-//            return statement;
-//        }
+        InsertStatement insertStatement = parseInsertStatement(tokens, cursor);
+        if(insertStatement != null){
+            Statement statement = new Statement();
+            statement.setInsertStatement(insertStatement);
+            statement.setType(ASTType.INSERT);
+            inputCursor.setIndex(cursor.getIndex());
+            return statement;
+        }
 //        CreateTableStatement createTableStatement = parseCreateStatement(tokens, cursor);
 //        if(createTableStatement != null){
 //            Statement statement = new Statement();
@@ -177,7 +178,41 @@ public class Parser {
         }
     }
 
-    // does increment cursor
+    private List<Expression> parseExpressions(List<Token> tokens, Cursor inputCursor, Token delimiter){
+        if(tokens == null || inputCursor == null || delimiter == null || inputCursor.getIndex() >= tokens.size()){
+            return null;
+        }
+        Cursor cursor = new Cursor(inputCursor.getIndex());
+        List<Expression> expressions = null;
+        while(true){
+            if(cursor.getIndex() >= tokens.size()){
+                return null;
+            }
+            boolean isDelimiter = expectToken(tokens, cursor, delimiter);
+            if(isDelimiter){
+                break;
+            }
+            if(expressions != null && expressions.size() > 0){
+                if(expectToken(tokens, cursor, tokenFromSymbol(Symbols.COMMA_SYMBOL))){
+                    cursor.increment();
+                }else{
+                    throw new RuntimeException("Expected comma but not found");
+                }
+            }
+            Expression expression = parseExpression(tokens, cursor);
+            if(expression == null){
+                throw new RuntimeException("Expected expression but not found");
+            }
+            if(expressions == null){
+                expressions = new ArrayList<>();
+            }
+            expressions.add(expression);
+        }
+        inputCursor.setIndex(cursor.getIndex());
+        return expressions;
+    }
+
+    // TODO: does increment cursor should we?
     private Expression parseExpression(List<Token> tokens, Cursor inputCursor) {
         if(tokens == null || inputCursor == null || inputCursor.getIndex() >= tokens.size() ){
             return null;
@@ -205,5 +240,54 @@ public class Parser {
             return currentToken;
         }
         return null;
+    }
+
+    private InsertStatement parseInsertStatement(List<Token> tokens, Cursor inputCursor) {
+        if(tokens == null || inputCursor == null || inputCursor.getIndex() >= tokens.size()){
+            return null;
+        }
+        Cursor cursor = new Cursor(inputCursor.getIndex());
+        // expect insert keyword first
+        boolean isInsertKeyword = expectToken(tokens, cursor, tokenFromKeyword(KeyWords.INSERT_KEYWORD));
+        if(!isInsertKeyword){
+            return null;
+        }
+        cursor.increment();
+        // expect into keyword next
+        boolean isIntoKeyword = expectToken(tokens, cursor, tokenFromKeyword(KeyWords.INTO_KEYWORD));
+        if(!isIntoKeyword){
+            throw new RuntimeException("Expected into keyword after insert but not found");
+        }
+        cursor.increment();
+        // expect tablename i.e., identifier
+        Token tableName = parseToken(tokens, cursor, TokenType.IDENTIFIER);
+        if(tableName == null){
+            throw new RuntimeException("Expected tablename after insert into kwywords but not found");
+        }
+        // expect values keyword next
+        boolean isValuesKeyword = expectToken(tokens, cursor, tokenFromKeyword(KeyWords.VALUES_KEYWORD));
+        if(!isValuesKeyword){
+            throw new RuntimeException("Expected values keyword but not found");
+        }
+        cursor.increment();
+        // expect left parenthesis
+        boolean isLeftParenthesis = expectToken(tokens, cursor, tokenFromSymbol(Symbols.LEFT_PARENTHESIS_SYMBOL));
+        if(!isLeftParenthesis){
+            throw new RuntimeException("Expected left parenthesis symbol but not found");
+        }
+        cursor.increment();
+        // expect expressions
+        List<Expression> expressions = parseExpressions(tokens, cursor, tokenFromSymbol(Symbols.RIGHT_PARENTHESIS_SYMBOL));
+        if(expressions == null){
+            throw new RuntimeException("Expected values in insert statement but not found");
+        }
+        // expect right parenthesis
+        boolean isRightParenthesis = expectToken(tokens, cursor, tokenFromSymbol(Symbols.RIGHT_PARENTHESIS_SYMBOL));
+        if(!isRightParenthesis){
+            throw new RuntimeException("Expected right parenthesis symbol but not found");
+        }
+        cursor.increment();
+        inputCursor.setIndex(cursor.getIndex());
+        return new InsertStatement(tableName, expressions);
     }
 }

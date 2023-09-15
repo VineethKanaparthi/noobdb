@@ -7,6 +7,9 @@ import org.dbnoobs.noobdb.parser.tokens.TokenType;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import java.util.HashMap;
+import java.util.Map;
+
 // TODO: Add more comprehensive tests
 class LexerTest {
     private final Lexer lexer = new Lexer();
@@ -48,6 +51,34 @@ class LexerTest {
 
     @Test
     void lexNumeric() {
+        Map<String, Token> tests = new HashMap<>() {{
+            // valid values
+            put("105", new Token("105", TokenType.NUMERIC, new Location(1, 0)));
+            put("105 ", new Token("105", TokenType.NUMERIC, new Location(1, 0)));
+            put("123.", new Token("123.", TokenType.NUMERIC, new Location(1, 0)));
+            put("123.145", new Token("123.145", TokenType.NUMERIC, new Location(1, 0)));
+            put("1e5", new Token("1e5", TokenType.NUMERIC, new Location(1, 0)));
+            put("1.e21", new Token("1.e21", TokenType.NUMERIC, new Location(1, 0)));
+            put("1.e-1", new Token("1.e-1", TokenType.NUMERIC, new Location(1, 0)));
+            put("1.e+2", new Token("1.e+2", TokenType.NUMERIC, new Location(1, 0)));
+            put("1e-1", new Token("1e-1", TokenType.NUMERIC, new Location(1, 0)));
+            put("1.", new Token("1.", TokenType.NUMERIC, new Location(1, 0)));
+            put(".1", new Token(".1", TokenType.NUMERIC, new Location(1, 0)));
+            // invalid values
+            put("e4", null);
+            put("1..", null);
+            put("1ee4", null);
+            put(" 1", null);
+        }};
+
+        tests.forEach((input, expected)->{
+            Cursor cursor = new Cursor();
+            Assertions.assertEquals(expected, lexer.lexNumeric(input, cursor));
+            if(expected == null){
+                Assertions.assertEquals(new Location(), cursor.getLocation());
+                Assertions.assertEquals(0, cursor.getPointer());
+            }
+        });
     }
 
     @Test

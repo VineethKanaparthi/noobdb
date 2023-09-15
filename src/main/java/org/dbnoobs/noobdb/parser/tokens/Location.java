@@ -59,4 +59,12 @@ public class Location {
     public int hashCode() {
         return Objects.hash(line, col);
     }
+
+    @Override
+    public String toString() {
+        return "{" +
+                "line=" + line +
+                ", col=" + col +
+                '}';
+    }
 }
