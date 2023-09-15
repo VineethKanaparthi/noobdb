@@ -16,12 +16,12 @@ class ParserTest {
     @Test
     void parseInsert() {
         Parser parser = new Parser();
-        Assertions.assertEquals(ASTGenerator.getInsertStatement(), parser.parse("INSERT INTO users VALUES (105, 233)"));
+        Assertions.assertEquals(ASTGenerator.insertStatement(), parser.parse("INSERT INTO users VALUES (105, 233)"));
    }
 
    @Test
     void parseCreate(){
         Parser parser = new Parser();
-        System.out.println(parser.parse("CREATE TABLE users (id INT, name TEXT)"));
+       Assertions.assertEquals(ASTGenerator.createStatement(), parser.parse("CREATE TABLE users (id INT, name TEXT)"));
    }
 }

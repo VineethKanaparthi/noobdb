@@ -88,7 +88,7 @@ public class ASTGenerator {
         );
     }
 
-    public static AST getInsertStatement(){
+    public static AST insertStatement(){
         return new AST(
                 List.of(
                         new Statement(
@@ -120,6 +120,51 @@ public class ASTGenerator {
                                         )
                                 ),
                                 ASTType.INSERT
+                        )
+                )
+        );
+    }
+
+    public static AST createStatement() {
+        return new AST(
+                List.of(
+                        new Statement(
+                                null,
+                                new CreateTableStatement(
+                                        new Token(
+                                                "users",
+                                                TokenType.IDENTIFIER,
+                                                new Location(1, 13)
+                                        ),
+                                        Arrays.asList(
+                                                new ColumnDefinition(
+                                                        new Token(
+                                                                "id",
+                                                                TokenType.IDENTIFIER,
+                                                                new Location(1, 20)
+                                                        ),
+                                                        new Token(
+                                                                "int",
+                                                                TokenType.KEYWORD,
+                                                                new Location(1, 23)
+                                                        )
+                                                ),
+                                                new ColumnDefinition(
+                                                        new Token(
+                                                                "name",
+                                                                TokenType.IDENTIFIER,
+                                                                new Location(1, 28)
+                                                        ),
+                                                        new Token(
+                                                                "text",
+                                                                TokenType.KEYWORD,
+                                                                new Location(1, 33)
+                                                        )
+                                                )
+                                        )
+                                ),
+                                null,
+                                ASTType.CREATE
                         )
                 )
         );
