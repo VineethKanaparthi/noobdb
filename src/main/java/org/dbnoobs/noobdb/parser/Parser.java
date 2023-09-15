@@ -78,14 +78,14 @@ public class Parser {
             inputCursor.setIndex(cursor.getIndex());
             return statement;
         }
-//        CreateTableStatement createTableStatement = parseCreateStatement(tokens, cursor);
-//        if(createTableStatement != null){
-//            Statement statement = new Statement();
-//            statement.setCreateTableStatement(createTableStatement);
-//            statement.setType(ASTType.CREATE);
-//            inputCursor.setIndex(cursor.getIndex());
-//            return statement;
-//        }
+        CreateTableStatement createTableStatement = parseCreateStatement(tokens, cursor);
+        if(createTableStatement != null){
+            Statement statement = new Statement();
+            statement.setCreateTableStatement(createTableStatement);
+            statement.setType(ASTType.CREATE);
+            inputCursor.setIndex(cursor.getIndex());
+            return statement;
+        }
         throw new RuntimeException(String.format("Expected Select/Insert/Create Statement but not found at index: %d, %s", inputCursor.getIndex(), tokens.get(inputCursor.getIndex())));
     }
 
@@ -289,5 +289,106 @@ public class Parser {
         cursor.increment();
         inputCursor.setIndex(cursor.getIndex());
         return new InsertStatement(tableName, expressions);
+    }
+
+    private CreateTableStatement parseCreateStatement(List<Token> tokens, Cursor inputCursor) {
+        if(tokens == null || inputCursor == null || inputCursor.getIndex() >= tokens.size()){
+            return null;
+        }
+
+        Cursor cursor = new Cursor(inputCursor.getIndex());
+        // expect create keyword
+        boolean isCreateKeyword = expectToken(tokens, cursor, tokenFromKeyword(KeyWords.CREATE_KEYWORD));
+        if(!isCreateKeyword){
+            return null;
+        }
+        cursor.increment();
+        // expect table keyword next
+        boolean isTableKeyword = expectToken(tokens, cursor, tokenFromKeyword(KeyWords.TABLE_KEYWORD));
+        if(!isTableKeyword){
+            throw new RuntimeException("Expected into keyword after insert but not found");
+        }
+        cursor.increment();
+        // expect tablename i.e., identifier
+        Token tableName = parseToken(tokens, cursor, TokenType.IDENTIFIER);
+        if(tableName == null){
+            throw new RuntimeException("Expected tablename after insert into kwywords but not found");
+        }
+        // expect left parenthesis
+        boolean isLeftParenthesis = expectToken(tokens, cursor, tokenFromSymbol(Symbols.LEFT_PARENTHESIS_SYMBOL));
+        if(!isLeftParenthesis){
+            throw new RuntimeException("Expected left parenthesis symbol but not found");
+        }
+        cursor.increment();
+        // expect expressions
+        List<ColumnDefinition> columnDefinitions = parseColumnDefinitions(tokens, cursor, tokenFromSymbol(Symbols.RIGHT_PARENTHESIS_SYMBOL));
+        if(columnDefinitions == null){
+            throw new RuntimeException("Expected column definitions in create statement but not found");
+        }
+        // expect right parenthesis
+        boolean isRightParenthesis = expectToken(tokens, cursor, tokenFromSymbol(Symbols.RIGHT_PARENTHESIS_SYMBOL));
+        if(!isRightParenthesis){
+            throw new RuntimeException("Expected right parenthesis symbol but not found");
+        }
+        cursor.increment();
+        inputCursor.setIndex(cursor.getIndex());
+        return new CreateTableStatement(tableName, columnDefinitions);
+    }
+
+    private List<ColumnDefinition> parseColumnDefinitions(List<Token> tokens, Cursor inputCursor, Token delimiter) {
+        if(tokens == null || inputCursor == null || delimiter == null | inputCursor.getIndex() >= tokens.size()){
+            return null;
+        }
+        Cursor cursor = new Cursor(inputCursor.getIndex());
+        List<ColumnDefinition> columnDefinitions = null;
+        while(true){
+            if(cursor.getIndex() >= tokens.size()){
+                return null;
+            }
+            boolean isDelimiter = expectToken(tokens, cursor, delimiter);
+            if(isDelimiter){
+                break;
+            }
+            if(columnDefinitions != null && columnDefinitions.size() > 0){
+                if(expectToken(tokens, cursor, tokenFromSymbol(Symbols.COMMA_SYMBOL))){
+                    cursor.increment();
+                }else{
+                    throw new RuntimeException("Expected comma but not found");
+                }
+            }
+            ColumnDefinition columnDefinition = parseColumnDefinition(tokens, cursor);
+            if(columnDefinition == null){
+                throw new RuntimeException("Expected Column Definition but not found");
+            }
+            if(columnDefinitions == null){
+                columnDefinitions = new ArrayList<>();
+            }
+            columnDefinitions.add(columnDefinition);
+        }
+        inputCursor.setIndex(cursor.getIndex());
+        return columnDefinitions;
+    }
+
+    private ColumnDefinition parseColumnDefinition(List<Token> tokens, Cursor inputCursor) {
+        if(tokens == null || inputCursor == null || inputCursor.getIndex() >= tokens.size()){
+            return null;
+        }
+        Cursor cursor = new Cursor(inputCursor.getIndex());
+        ColumnDefinition columnDefinition = new ColumnDefinition();
+        Token columnName = parseToken(tokens, cursor, TokenType.IDENTIFIER);
+        if(columnName == null){
+            throw new RuntimeException("Expected column name identifier but not found");
+        }
+        columnDefinition.setName(columnName);
+        Token intKeyword = tokenFromKeyword(KeyWords.INT_KEYWORD);
+        Token textKeyword = tokenFromKeyword(KeyWords.TEXT_KEYWORD);
+        if(expectToken(tokens, cursor, intKeyword) || expectToken(tokens, cursor, textKeyword)){
+            columnDefinition.setDatatype(tokens.get(cursor.getIndex()));
+            cursor.increment();
+        }else{
+            throw new RuntimeException("Expected data type(int | text) token but not found");
+        }
+        inputCursor.setIndex(cursor.getIndex());
+        return columnDefinition;
     }
 }

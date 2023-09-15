@@ -2,9 +2,14 @@ package org.dbnoobs.noobdb.parser.ast;
 
 import org.dbnoobs.noobdb.parser.tokens.Token;
 
+import java.util.Objects;
+
 public class ColumnDefinition {
     private Token name;
     private Token datatype;
+
+    public ColumnDefinition() {
+    }
 
     public ColumnDefinition(Token name, Token datatype) {
         this.name = name;
@@ -33,5 +38,18 @@ public class ColumnDefinition {
                 "name=" + name +
                 ", datatype=" + datatype +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ColumnDefinition that = (ColumnDefinition) o;
+        return Objects.equals(name, that.name) && Objects.equals(datatype, that.datatype);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, datatype);
     }
 }
