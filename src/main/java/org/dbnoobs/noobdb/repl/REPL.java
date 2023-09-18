@@ -1,8 +1,6 @@
 package org.dbnoobs.noobdb.repl;
 
-import org.dbnoobs.noobdb.memorybackend.Cell;
-import org.dbnoobs.noobdb.memorybackend.MemoryBackend;
-import org.dbnoobs.noobdb.memorybackend.Results;
+import org.dbnoobs.noobdb.memorybackend.*;
 import org.dbnoobs.noobdb.parser.Parser;
 import org.dbnoobs.noobdb.parser.ast.AST;
 import org.dbnoobs.noobdb.parser.ast.ASTType;
@@ -53,8 +51,6 @@ public class REPL {
                 }
             }else{
                 try{
-
-
                     AST ast = parser.parse(command);
                     if(ast == null || ast.getStatements() == null){
                         System.out.println("please give valid sql");
@@ -63,12 +59,37 @@ public class REPL {
                     for(Statement statement: ast.getStatements()){
                         if(statement.getType().equals(ASTType.SELECT)){
                             Results results = memoryBackend.select(statement.getSelectStatement());
-                            System.out.println(results);
+                            if(results == null || results.getColumns() == null || results.getColumns().size() == 0|| results.getRows() == null || results.getRows().size()==0){
+                                System.out.println("Table is empty");
+                            }else{
+                                System.out.print("|");
+                                for(Column column: results.getColumns()){
+                                    System.out.print(column.getName() + " |");
+                                }
+                                System.out.print("\n");
+                                for(int i=0;i<results.getColumns().size();i++){
+                                    System.out.print("--------------");
+                                }
+                                System.out.print("\n");
+                                for(List<Cell> row: results.getRows()){
+                                    System.out.print("|");
+                                    for(int i=0;i<row.size();i++){
+                                        if(results.getColumns().get(i).getType().equals(ColumnType.INT)){
+                                            System.out.print(row.get(i).asInt() + " |");
+                                        }else{
+                                            System.out.print(row.get(i).asText() + " |");
+                                        }
+
+                                    }
+                                    System.out.print("\n");
+                                }
+                            }
                         }else if(statement.getType().equals(ASTType.CREATE)){
                             memoryBackend.createTable(statement.getCreateTableStatement());
                             System.out.println("Create table succeeded");
                         }else if(statement.getType().equals(ASTType.INSERT)){
                             memoryBackend.insert(statement.getInsertStatement());
+                            System.out.println("values inserted");
                         }else{
                             System.out.println("Expected a select, create or insert statement but not found");
                             throw new RuntimeException();
