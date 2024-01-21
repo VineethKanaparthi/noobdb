@@ -182,7 +182,7 @@ public class Lexer {
     }
 
     /**
-     * identifiers can be eitther double quoted string or a group of characters starting with an alphabetical char
+     * identifiers can be either double quoted string or a group of characters starting with an alphabetical char
      * @param input
      * @param inputCursor
      * @return

@@ -11,7 +11,13 @@ public class KeyWords {
     public static final String VALUES_KEYWORD = "values";
     public static final String INT_KEYWORD = "int";
     public static final String TEXT_KEYWORD = "text";
+    public static final String WHERE_KEYWORD = "where";
+    public static final String AND_KEYWORD = "and";
+    public static final String OR_KEYWORD = "or";
+    public static final String TRUE_KEYWORD = "true";
+    public static final String FALSE_KEYWORD = "false";
 
     public static final String[] KEYWORDS = {SELECT_KEYWORD, FROM_KEYWORD, AS_KEYWORD, TABLE_KEYWORD, CREATE_KEYWORD,
-    INSERT_KEYWORD, INT_KEYWORD, INTO_KEYWORD, VALUES_KEYWORD, TEXT_KEYWORD};
+    INSERT_KEYWORD, INT_KEYWORD, INTO_KEYWORD, VALUES_KEYWORD, TEXT_KEYWORD, WHERE_KEYWORD, AND_KEYWORD,
+    OR_KEYWORD, TRUE_KEYWORD, FALSE_KEYWORD};
 }

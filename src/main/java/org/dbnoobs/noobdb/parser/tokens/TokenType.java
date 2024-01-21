@@ -6,5 +6,6 @@ public enum TokenType {
     IDENTIFIER,
     NUMERIC,
     STRING,
-    WHITESPACE
+    WHITESPACE,
+    BOOL
 }
